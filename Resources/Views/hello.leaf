@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World - SafeAndBrave</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideIn 0.8s ease-out;
+            position: relative;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(20deg); }
+            75% { transform: rotate(-10deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .greeting-icon {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            animation: wave 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .sparkles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .sparkle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 3s infinite;
+        }
+        
+        .sparkle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .sparkle:nth-child(2) { top: 60%; left: 20%; animation-delay: 0.5s; }
+        .sparkle:nth-child(3) { top: 40%; left: 80%; animation-delay: 1s; }
+        .sparkle:nth-child(4) { top: 70%; left: 70%; animation-delay: 1.5s; }
+        .sparkle:nth-child(5) { top: 30%; left: 50%; animation-delay: 2s; }
+        
+        .content {
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .welcome-card {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .welcome-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .welcome-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+        }
+        
+        .welcome-description {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+        }
+        
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            color: white;
+            text-decoration: none;
+            font-size: 1.3rem;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+        
+        .back-link:hover {
+            opacity: 1;
+            transform: translateX(-3px);
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .container {
+                max-height: 98vh;
+            }
+            
+            .header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .greeting-icon {
+                font-size: 3rem;
+            }
+            
+            .content {
+                padding: 1.5rem;
+            }
+            
+            .welcome-card {
+                padding: 1.5rem;
+            }
+
+            .actions {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 200px;
+                justify-content: center;
+            }
+            
+            .welcome-text {
+                font-size: 1.3rem;
+            }
+            
+            .welcome-description {
+                font-size: 0.95rem;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            .header {
+                padding: 1.5rem 2rem;
+            }
+            
+            .greeting-icon {
+                font-size: 2.5rem;
+                margin-bottom: 0.25rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 0.25rem;
+            }
+            
+            .content {
+                padding: 1.5rem;
+            }
+            
+            .welcome-card {
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+            }
+            
+            .actions {
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-link">←</a>
+            <div class="sparkles">
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+            </div>
+            <div class="greeting-icon">👋</div>
+            <h1>Hello, World!</h1>
+            <p class="subtitle">Welcome to SafeAndBrave</p>
+        </div>
+        
+        <div class="content">
+            <div class="welcome-card">
+                <div class="welcome-text">Greetings from SafeAndBrave!</div>
+                <div class="welcome-description">
+                    This is your friendly hello endpoint, confirming that your Vapor application is running smoothly.
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="/" class="btn">
+                    🏠 Go Home
+                </a>
+                <a href="/users" class="btn btn-secondary">
+                    👥 View Users
+                </a>
+                <a href="/health" class="btn btn-outline">
+                    💚 Check Health
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

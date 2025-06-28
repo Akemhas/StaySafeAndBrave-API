@@ -1,0 +1,53 @@
+# Current (good!)
+.build/
+.swiftpm/
+
+# Git
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Environment files (secrets shouldn't go in Docker)
+.env*
+!.env.example
+
+# Database files (don't copy local DBs)
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs
+*.log
+logs/
+
+# macOS
+.DS_Store
+._*
+
+# Testing
+.build-test/
+test-results/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Docker itself
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
