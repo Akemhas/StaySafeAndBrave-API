@@ -18,7 +18,7 @@
 volumes:
   db_data:
   pgadmin_data:
-  
+
 x-shared_environment: &shared_environment
   LOG_LEVEL: ${LOG_LEVEL:-debug}
   DATABASE_HOST: db
@@ -26,7 +26,7 @@ x-shared_environment: &shared_environment
   DATABASE_USERNAME: vapor_username
   DATABASE_PASSWORD: vapor_password
   AUTO_MIGRATE: "true"  # Enable auto-migration for local development
-  
+
 services:
   app:
     image: safeandbrave:latest
@@ -35,13 +35,15 @@ services:
     environment:
       <<: *shared_environment
     depends_on:
-      - db
+      db:
+        condition: service_healthy  # Wait for DB to be healthy
     ports:
       - '8080:8080'
     networks:
       - safeandbrave
     command: ["serve", "--env", "development", "--hostname", "0.0.0.0", "--port", "8080"]
-    
+    restart: unless-stopped  # Auto-restart if app crashes
+  
   # Separate migration service for explicit migration runs
   migrate:
     image: safeandbrave:latest
@@ -50,13 +52,14 @@ services:
     environment:
       <<: *shared_environment
     depends_on:
-      - db
+      db:
+        condition: service_healthy  # Wait for DB to be healthy
     networks:
       - safeandbrave
     command: ["migrate", "--yes"]
     deploy:
       replicas: 0
-      
+  
   # Service to revert migrations
   revert:
     image: safeandbrave:latest
@@ -65,13 +68,14 @@ services:
     environment:
       <<: *shared_environment
     depends_on:
-      - db
+      db:
+        condition: service_healthy  # Wait for DB to be healthy
     networks:
       - safeandbrave
     command: ["migrate", "--revert", "--yes"]
     deploy:
       replicas: 0
-      
+  
   db:
     image: postgres:16-alpine
     volumes:
@@ -85,12 +89,13 @@ services:
       - '5432:5432'
     networks:
       - safeandbrave
-    healthcheck:
+    healthcheck:  # Health check configuration
       test: ["CMD-SHELL", "pg_isready -U vapor_username -d vapor_database"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      
+      interval: 5s      # Check every 5 seconds
+      timeout: 5s       # Wait 5 seconds for response
+      retries: 10       # Try 10 times
+      start_period: 30s # Wait 30 seconds before first check
+  
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin
@@ -105,6 +110,6 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     networks:
       - safeandbrave
-      
+
 networks:
   safeandbrave:
