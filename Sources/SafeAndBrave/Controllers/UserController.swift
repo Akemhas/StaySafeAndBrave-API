@@ -13,7 +13,8 @@ struct UserController: RouteCollection {
               user.delete(use: self.delete)
           }
 
-          users.get(use: self.listUsers) // <-- THIS maps GET /users to listUsers(req:)
+          users.get(use: self.listUsers) // HTML
+          users.get("json", use: self.getAllUsersJSON) // JSON
       }
 
     @Sendable
@@ -138,6 +139,12 @@ struct UserController: RouteCollection {
         )
 
         return try await req.view.render("users", context)
+    }
+    
+    @Sendable
+    func getAllUsersJSON(req: Request) async throws -> [UserDTO] {
+        let users = try await User.query(on: req.db).all()
+        return users.map { $0.toDTO() }
     }
 }
 
