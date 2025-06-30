@@ -5,11 +5,11 @@ struct BookingDTO: Content {
     var id: UUID?
     var userID: UUID?
     var mentorID: UUID?
-    var date: Date?
+    var date: String?
     var status: String?
     var description: String?
 
-    init(id: UUID? = nil, userID: UUID? = nil, mentorID: UUID? = nil, date: Date? = nil, status: String? = nil, description: String? = nil) {
+    init(id: UUID? = nil, userID: UUID? = nil, mentorID: UUID? = nil, date: String? = nil, status: String? = nil, description: String? = nil) {
         self.id = id
         self.userID = userID
         self.mentorID = mentorID

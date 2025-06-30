@@ -15,7 +15,7 @@ struct UserDTO: Content {
         // Decode user and mentor using their IDs
         
         
-        //self.id = id
+        self.id = id
         self.name = name
         self.email = email
         self.password = password

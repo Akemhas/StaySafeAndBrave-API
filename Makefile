@@ -23,7 +23,8 @@ build:
 
 # Start application
 up:
-	docker compose up app
+	docker compose down
+	docker compose up --build
 
 # Start in development mode with logs
 dev:

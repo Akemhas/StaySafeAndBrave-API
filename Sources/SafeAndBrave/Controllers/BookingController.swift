@@ -32,7 +32,7 @@ struct BookingController: RouteCollection {
         let booking = Booking(
             userID: user.id ?? UUID(),
             mentorID: mentor.id ?? UUID(),
-            date: dto.date ?? Date(),
+            date: dto.date ?? "29/06/2025",
             status: dto.status ?? "pending",
             description: dto.description ?? ""
         )
@@ -87,6 +87,9 @@ struct BookingController: RouteCollection {
         }
         if let status = dto.status {
             booking.status = status
+        }
+        if let description = dto.description {
+            booking.description = description
         }
         // Save the updated booking to the database
         try await booking.save(on: req.db)

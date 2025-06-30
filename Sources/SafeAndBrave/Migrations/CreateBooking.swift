@@ -6,8 +6,9 @@ struct CreateBooking: AsyncMigration {
             .id()
             .field("user_id", .uuid, .required, .references("users", "id", onDelete: .cascade))
             .field("mentor_id", .uuid, .required, .references("mentors", "id", onDelete: .cascade))
-            .field("date", .datetime, .required)
+            .field("date", .string, .required)
             .field("status", .string, .required)
+            .field("description", .string, .required)
             .create()
     }
 

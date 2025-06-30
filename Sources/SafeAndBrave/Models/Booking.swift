@@ -19,7 +19,7 @@ final class Booking: Model, @unchecked Sendable {
     var mentor: Mentor
 
     @Field(key: "date") 
-    var date: Date
+    var date: String
 
     @Field(key: "status") 
     var status: String
@@ -29,7 +29,7 @@ final class Booking: Model, @unchecked Sendable {
 
     init() { }
 
-    init(id: UUID? = nil, userID: UUID, mentorID: UUID, date: Date, status: String, description: String) {
+    init(id: UUID? = nil, userID: UUID, mentorID: UUID, date: String, status: String, description: String) {
         self.id = id
         self.$user.id = userID
         self.$mentor.id = mentorID
