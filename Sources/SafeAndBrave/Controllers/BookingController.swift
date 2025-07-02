@@ -6,8 +6,10 @@ struct BookingController: RouteCollection {
         let BookingRoutes = routes.grouped("bookings")
 
         BookingRoutes.post(use: self.create)
-        BookingRoutes.get(":userID", use: self.index)
-        BookingRoutes.get(":mentorID", use: self.indexForMentor)
+        
+        BookingRoutes.get("user", ":userID", use: self.index)
+        BookingRoutes.get("mentor", ":mentorID", use: self.indexForMentor)
+        
         BookingRoutes.group(":id") { model in
             model.put(use: self.update)
             model.delete(use: self.delete)
@@ -75,12 +77,6 @@ struct BookingController: RouteCollection {
             .all()
         return bookings.map { $0.toDTO() }
     }
-
-    
-    // @Sendable
-    // func get(req: Request) async throws -> BookingDTO {
-    //     // Fetch a single model by ID from the database and return it as a DTO
-    // }
 
     @Sendable
     func update(req: Request) async throws -> BookingDTO {
