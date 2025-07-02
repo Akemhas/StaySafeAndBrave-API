@@ -46,38 +46,61 @@ struct BookingController: RouteCollection {
     }
 
     @Sendable
-    func index(req: Request) async throws -> [BookingDTO] {
-        // Fetch all Bookings belonging to a user from the database and return them as DTOs
-        guard let userID = req.parameters.get("userID"), let id = UUID(uuidString: userID) else {
-            throw Abort(.badRequest, reason: "Invalid user ID")
+        func index(req: Request) async throws -> [BookingResponseDTO] {
+            guard let userID = req.parameters.get("userID"), let id = UUID(uuidString: userID) else {
+                throw Abort(.badRequest, reason: "Invalid user ID")
+            }
+            guard let user = try await User.find(id, on: req.db) else {
+                throw Abort(.notFound, reason: "User not found")
+            }
+            
+            // Single query with joins to get all data at once
+            let bookings = try await Booking.query(on: req.db)
+                .filter(\.$user.$id == user.id ?? UUID())
+                .with(\.$mentor) {
+                    $0.with(\.$user) // This loads the mentor's user data
+                }
+                .all()
+            
+            // Convert to response DTOs
+            return bookings.map { booking in
+                BookingResponseDTO(
+                    from: booking,
+                    user: user,
+                    mentor: booking.mentor,
+                    mentorUser: booking.mentor.user
+                )
+            }
         }
-        guard let user = try await User.find(id, on: req.db) else {
-            throw Abort(.notFound, reason: "User not found")
-        }
-        let bookings = try await Booking.query(on: req.db)
-            .filter(\.$user.$id == user.id ?? UUID())
-            .with(\.$mentor) // Eager load the mentor relationship
-            .all()
-        return bookings.map { $0.toDTO() }
-    }
 
-    // get all bookings for a mentor
-    @Sendable
-    func indexForMentor(req: Request) async throws -> [BookingDTO] {
-        // Fetch all Bookings belonging to a mentor from the database and return them as DTOs
-        guard let mentorID = req.parameters.get("mentorID"), let id = UUID(uuidString: mentorID) else {
-            throw Abort(.badRequest, reason: "Invalid mentor ID")
+        @Sendable
+        func indexForMentor(req: Request) async throws -> [BookingResponseDTO] {
+            guard let mentorID = req.parameters.get("mentorID"), let id = UUID(uuidString: mentorID) else {
+                throw Abort(.badRequest, reason: "Invalid mentor ID")
+            }
+            guard let mentor = try await Mentor.find(id, on: req.db) else {
+                throw Abort(.notFound, reason: "Mentor not found")
+            }
+            
+            // Single query with joins to get all data at once
+            let bookings = try await Booking.query(on: req.db)
+                .filter(\.$mentor.$id == mentor.id ?? UUID())
+                .with(\.$user) // Load booking user data
+                .with(\.$mentor) {
+                    $0.with(\.$user) // Load mentor user data
+                }
+                .all()
+            
+            // Convert to response DTOs
+            return bookings.map { booking in
+                BookingResponseDTO(
+                    from: booking,
+                    user: booking.user,
+                    mentor: booking.mentor,
+                    mentorUser: booking.mentor.user
+                )
+            }
         }
-        guard let mentor = try await Mentor.find(id, on: req.db) else {
-            throw Abort(.notFound, reason: "Mentor not found")
-        }
-        let bookings = try await Booking.query(on: req.db)
-            .filter(\.$mentor.$id == mentor.id ?? UUID())
-            .with(\.$user) // Eager load the user relationship
-            .all()
-        return bookings.map { $0.toDTO() }
-    }
-
     @Sendable
     func update(req: Request) async throws -> BookingDTO {
         // Update an existing Booking model in the database using the request body
