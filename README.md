@@ -1,23 +1,66 @@
 # SafeAndBrave
 
-💧 A project built with the Vapor web framework.
+A project built with the Vapor web framework.
+
+## Prerequisites
+
+- Docker
+- Docker Compose
 
 ## Getting Started
 
-To build the project using the Swift Package Manager, run the following command in the terminal from the root of the project:
+This project uses Docker Compose for development.
+
+### First Time Setup
+
+1. Clone the repository
+2. Make sure Docker is running on your system
+3. Start the development environment:
+   ```bash
+   make dev
+   ```
+
+This will build and start the necessary containers. The first run may take a few minutes to download and build images.
+
+### Development Commands
+
+Use the following Make commands to manage the application:
+
+### Development Commands
+
 ```bash
-swift build
+make dev        # Start development (default) When you want speed (no pgAdmin)
+make dev-fast   # Start without pgAdmin (faster)
+make up         # Start all services
+make down       # Stop all services
+make restart    # Restart app only (Run on Code changes)
+make logs       # Show app logs
+make migrate    # Run migrations
+make clean      # Clean containers/volumes
+make rebuild    # Full rebuild
 ```
 
-To run the project and start the server, use the following command:
-```bash
-swift run
-```
+### Common Workflow
 
-To execute tests, use the following command:
-```bash
-swift test
-```
+1. Start development environment:
+   ```bash
+   make dev
+   ```
+
+2. View logs:
+   ```bash
+   make logs
+   ```
+
+3. Restart after code changes:
+   ```bash
+   make restart
+   ```
+
+4. Stop services:
+   ```bash
+   make down
+   ```
 
 ### See more
 

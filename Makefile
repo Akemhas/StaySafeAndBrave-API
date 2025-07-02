@@ -22,6 +22,10 @@ dev:
 dev-fast:
 	docker compose up db app --build
 
+downup:
+	docker compose down
+	docker compose up --build
+
 # Start all services
 up:
 	docker compose up --build
