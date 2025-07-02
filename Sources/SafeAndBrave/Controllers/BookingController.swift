@@ -7,6 +7,7 @@ struct BookingController: RouteCollection {
 
         BookingRoutes.post(use: self.create)
         BookingRoutes.get(":userID", use: self.index)
+        BookingRoutes.get(":mentorID", use: self.indexForMentor)
         BookingRoutes.group(":id") { model in
             model.put(use: self.update)
             model.delete(use: self.delete)
@@ -54,6 +55,23 @@ struct BookingController: RouteCollection {
         let bookings = try await Booking.query(on: req.db)
             .filter(\.$user.$id == user.id ?? UUID())
             .with(\.$mentor) // Eager load the mentor relationship
+            .all()
+        return bookings.map { $0.toDTO() }
+    }
+
+    // get all bookings for a mentor
+    @Sendable
+    func indexForMentor(req: Request) async throws -> [BookingDTO] {
+        // Fetch all Bookings belonging to a mentor from the database and return them as DTOs
+        guard let mentorID = req.parameters.get("mentorID"), let id = UUID(uuidString: mentorID) else {
+            throw Abort(.badRequest, reason: "Invalid mentor ID")
+        }
+        guard let mentor = try await Mentor.find(id, on: req.db) else {
+            throw Abort(.notFound, reason: "Mentor not found")
+        }
+        let bookings = try await Booking.query(on: req.db)
+            .filter(\.$mentor.$id == mentor.id ?? UUID())
+            .with(\.$user) // Eager load the user relationship
             .all()
         return bookings.map { $0.toDTO() }
     }

@@ -47,14 +47,15 @@ struct UserController: RouteCollection {
     }
 
     @Sendable
-    func login(req: Request) async throws -> UserDTO {
-        let userDTO = try req.content.decode(UserDTO.self)
+    func login(req: Request) async throws -> UserMentorDTO {
+        let userDTO = try req.content.decode(UserMentorDTO.self)
 
         guard let user = try await User.query(on: req.db)
             .filter(\.$email == userDTO.email ?? "")
             .first() else {
             throw Abort(.unauthorized, reason: "Invalid email or password")
         }
+
 
         guard let password = userDTO.password, try Bcrypt.verify(password, created: user.password)
         else {
@@ -64,9 +65,38 @@ struct UserController: RouteCollection {
         // TODO: Implement token generation for authenticated users
         // For now, we will just return the user DTO
         
-        // If the password is valid, return the user DTO
+        // if user has role mentor get the mentor corresponding to the user from mentor table
+        if user.role == "mentor" {
+            guard let mentor = try await Mentor.query(on: req.db)
+                .filter(\.$user.$id == user.id ?? UUID())
+                .first() else {
+                throw Abort(.notFound, reason: "Mentor not found")
+            }
+            // Convert the mentor to a DTO and add it to the user DTO
+            return UserMentorDTO(
+                id: user.id,
+                mentorID: mentor.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                birth_date: user.birth_date,
+                location: mentor.location,
+                bio: mentor.bio,
+                profile_image: mentor.profile_image,
+                score: mentor.score,
+                languages: mentor.languages,
+                hobbies: mentor.hobbies
+            )
+        }
 
-        return user.toDTO()
+        return UserMentorDTO(
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            birth_date: user.birth_date
+        )
+        // If the user is not a mentor, just return the user DTO
     }
 
     @Sendable

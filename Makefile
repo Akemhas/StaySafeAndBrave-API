@@ -1,88 +1,55 @@
-.PHONY: help build up down restart logs shell clean migrate revert rebuild clean-rebuild clear-docker
+.PHONY: help dev dev-fast up down restart logs clean migrate rebuild
 
 # Default target
 help:
 	@echo "Available commands:"
-	@echo "  make build          - Build all containers"
-	@echo "  make up             - Start the application"
-	@echo "  make down           - Stop all containers"
-	@echo "  make restart        - Restart the application"
-	@echo "  make logs           - Show application logs"
-	@echo "  make shell          - Open shell in app container"
-	@echo "  make clean          - Remove containers and volumes"
-	@echo "  make migrate        - Run database migrations"
-	@echo "  make revert         - Revert database migrations"
-	@echo "  make rebuild        - Full rebuild (down, build, up)"
-	@echo "  make clean-rebuild  - Clean Docker cache + rebuild"
-	@echo "  make clear-docker   - Clean all unused Docker resources"
-	@echo "  make dev            - Start in development mode"
+	@echo "  make dev            - Start development (default) When you want speed (no pgAdmin)"
+	@echo "  make dev-fast       - Start without pgAdmin (faster)"
+	@echo "  make up             - Start all services"
+	@echo "  make down           - Stop all services"
+	@echo "  make restart        - Restart app only (Run on Code changes)"
+	@echo "  make logs           - Show app logs"
+	@echo "  make migrate        - Run migrations"
+	@echo "  make clean          - Clean containers/volumes"
+	@echo "  make rebuild        - Full rebuild"
 
-# Build containers
-build:
-	docker compose build
+# Development mode (most used)
+# When you want speed (no pgAdmin)
+dev:
+	docker compose up app --build 
 
-# Start application
+# Fast development (no pgAdmin)
+dev-fast:
+	docker compose up db app --build
+
+# Start all services
 up:
-	docker compose down
 	docker compose up --build
 
-# Start in development mode with logs
-dev:
-	docker compose up app --build
-
-# Stop containers
+# Stop services
 down:
 	docker compose down
 
-# Restart application
+# Restart app only
+# Run on Code changes
 restart:
-	docker compose restart app
+	docker compose restart app 
 
 # Show logs
 logs:
 	docker compose logs -f app
 
-# Open shell in app container
-shell:
-	docker compose exec app /bin/bash
+# Run migrations
+migrate:
+	docker compose run --rm migrate
 
-# Clean up everything
+# Clean up
 clean:
 	docker compose down -v
 	docker system prune -f
 
-# Run migrations
-migrate:
-	docker compose run migrate
-
-# Revert migrations
-revert:
-	docker compose run revert
-
-# 🆕 IMPROVED: Clean rebuild with Docker cleanup
-clean-rebuild:
-	@echo "Cleaning up Docker resources..."
-	docker compose down -v
-	docker system prune -a -f --volumes
-	@echo "Starting clean rebuild..."
-	docker compose build --no-cache --pull app
-	docker compose up app
-
-# Standard rebuild
+# Full rebuild when things break
 rebuild:
 	docker compose down -v
-	docker image prune -f
-	docker compose build --no-cache --pull app
+	docker compose build --no-cache app
 	docker compose up app
-
-# Comprehensive Docker cleanup
-clear-docker:
-	@echo "🧹 Cleaning up all unused Docker resources..."
-	docker compose down -v
-	docker system prune -a -f --volumes
-	docker builder prune -f
-	@echo "Docker cleanup completed!"
-	
-# Quick restart for development
-quick:
-	docker compose restart app && docker compose logs -f app
