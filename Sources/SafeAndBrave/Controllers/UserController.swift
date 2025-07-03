@@ -17,6 +17,8 @@ struct UserController: RouteCollection {
           users.get("json", use: self.getAllUsersJSON) // JSON
       }
 
+    // MARK: - Register
+
     @Sendable
     func register(req: Request) async throws -> UserDTO {
         let userDTO = try req.content.decode(UserDTO.self)
@@ -34,7 +36,7 @@ struct UserController: RouteCollection {
         // Create a new user model from the request body
         let user = User(
             name: userDTO.name ?? "",
-            email: userDTO.email ?? "",
+            email: userDTO.email?.lowercased() ?? "",
             password: hashedPassword,
             role: userDTO.role ?? "user",
             birth_date: userDTO.birth_date ?? Date().ISO8601Format() // Default to current date if not provided
@@ -45,13 +47,15 @@ struct UserController: RouteCollection {
         try await user.save(on: req.db)
         return user.toDTO()
     }
+    
+    // MARK: - Login
 
     @Sendable
     func login(req: Request) async throws -> UserMentorDTO {
         let userDTO = try req.content.decode(UserMentorDTO.self)
 
         guard let user = try await User.query(on: req.db)
-            .filter(\.$email == userDTO.email ?? "")
+            .filter(\.$email ~~ (userDTO.email ?? ""))
             .first() else {
             throw Abort(.unauthorized, reason: "Invalid email or password")
         }
@@ -99,6 +103,8 @@ struct UserController: RouteCollection {
         // If the user is not a mentor, just return the user DTO
     }
 
+    // MARK: - Index
+    
     @Sendable
     func index(req: Request) async throws -> UserDTO {
         // Fetch a user by ID from the database
@@ -109,6 +115,8 @@ struct UserController: RouteCollection {
         return user.toDTO()
     }  
 
+    // MARK: - Update
+    
     @Sendable
     func update(req: Request) async throws -> UserDTO {
         // Fetch the user by ID
@@ -143,7 +151,7 @@ struct UserController: RouteCollection {
         return user.toDTO()
     }  
 
-
+    // MARK: - Delete
 
     @Sendable
     func delete(req: Request) async throws -> HTTPStatus {
